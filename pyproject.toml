@@ -1,0 +1,20 @@
+[project]
+name = "sandbox"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+classifiers = [
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "fastapi>=0.115.2",
+    "granian>=1.6.0",
+    "orjson>=3.10.7",
+    "pydantic>=2.9.2",
+    "uvloop>=0.20",
+]
+
+[tool.uv]
+dev-dependencies = ["granian[reload]>=1.6.0"]
