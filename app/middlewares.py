@@ -11,6 +11,8 @@ from starlette.types import ASGIApp
 class RequestLoggingMiddleware(BaseHTTPMiddleware):
     """Request logging middleware."""
 
+    logger: logging.Logger
+
     def __init__(self, app: ASGIApp, logger: logging.Logger) -> None:
         """Initialize the middleware."""
         super().__init__(app)

@@ -18,6 +18,7 @@ api = FastAPI(
 )
 
 api.include_router(healthcheck.router)
+api.include_router(chat.router)
+
 api.add_middleware(RequestLoggingMiddleware, logger=logger)
 api.add_middleware(CommonHeadersMiddleware)
-api.include_router(chat.router)
