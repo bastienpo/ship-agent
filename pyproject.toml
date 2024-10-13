@@ -1,7 +1,7 @@
 [project]
-name = "sandbox"
+name = "heypi"
 version = "0.1.0"
-description = "Add your description here"
+description = "Make LLM interoperable and following OpenAI API."
 readme = "README.md"
 requires-python = ">=3.12"
 classifiers = [

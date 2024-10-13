@@ -2,14 +2,14 @@
 
 from fastapi import APIRouter
 
-from app.internal.data.chat import Chat, ChatInput
+from app.internal.data import Chat, ChatInput
 
 router = APIRouter(prefix="/v1")
 
 
 @router.post(
     "/chat/completions",
-    summary="Post a message to the chat.",
+    summary="Generate a completion for the provided messages.",
     response_model=Chat,
 )
 async def chat_post(data: ChatInput) -> Chat:
