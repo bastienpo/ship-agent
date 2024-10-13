@@ -3,13 +3,18 @@
 import os
 
 from fastapi import APIRouter
-from fastapi.responses import ORJSONResponse
+
+from app.internal.data.healthcheck import Healthcheck
 
 router = APIRouter(prefix="/v1")
 
 
-@router.get("/healthcheck")
-async def healthcheck() -> ORJSONResponse:
+@router.get(
+    "/healthcheck",
+    summary="Healthcheck endpoint.",
+    response_model=Healthcheck,
+)
+async def healthcheck() -> Healthcheck:
     """Healthcheck endpoint."""
     return {
         "status": "available",

@@ -1,7 +1,6 @@
 """Chat router."""
 
 from fastapi import APIRouter
-from fastapi.responses import ORJSONResponse
 
 from app.internal.data.chat import Chat, ChatInput
 
@@ -13,15 +12,15 @@ router = APIRouter(prefix="/v1")
     summary="Post a message to the chat.",
     response_model=Chat,
 )
-async def chat_post(input: ChatInput) -> ORJSONResponse:
+async def chat_post(data: ChatInput) -> Chat:
     """Post a message to the chat.
 
     Args:
-        input: The input to the chat.
+        data: The input to the chat.
 
     Returns:
         The response from the chat.
     """
-    _ = input
+    _ = data
 
     return Chat(message="Hello, World!")
