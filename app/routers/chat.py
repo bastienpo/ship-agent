@@ -4,7 +4,7 @@ from fastapi import APIRouter
 
 from app.internal.data import Chat, ChatInput
 
-router = APIRouter(prefix="/v1")
+router = APIRouter(prefix="/v1", tags=["chat"])
 
 
 @router.post(

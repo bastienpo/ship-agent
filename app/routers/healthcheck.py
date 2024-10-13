@@ -6,7 +6,7 @@ from fastapi import APIRouter
 
 from app.internal.data.healthcheck import Healthcheck
 
-router = APIRouter(prefix="/v1")
+router = APIRouter(prefix="/v1", tags=["healthcheck"])
 
 
 @router.get(
