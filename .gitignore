@@ -123,6 +123,7 @@ celerybeat.pid
 
 # Environments
 .env
+.envrc
 .venv
 env/
 venv/
@@ -162,3 +163,9 @@ cython_debug/
 #.idea/
 
 .DS_Store
+
+# tls
+tls/
+*.pem
+*.key
+*.crt

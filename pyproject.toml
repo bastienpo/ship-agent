@@ -9,9 +9,11 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
+    "asyncio>=3.4.3",
     "fastapi>=0.115.2",
     "granian>=1.6.0",
     "orjson>=3.10.7",
+    "pydantic-settings>=2.5.2",
     "pydantic>=2.9.2",
     "uvloop>=0.20",
 ]

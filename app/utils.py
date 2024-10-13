@@ -1,15 +1,15 @@
 import logging
-from fastapi import Request
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
+
+from fastapi import Request
 
 
 class LoggingFormatter(logging.Formatter):
     """Custom formatter for logging."""
 
     def format(self, record: dict[str, Any]) -> str:
-        """
-        Format the record to a string.
+        """Format the record to a string.
 
         Args:
             record: The record to format.
@@ -17,7 +17,7 @@ class LoggingFormatter(logging.Formatter):
         Returns:
             The formatted record as a string.
         """
-        timestamp = datetime.now(timezone.utc).astimezone().isoformat()
+        timestamp = datetime.now(UTC).astimezone().isoformat()
 
         log_msg = (
             f'time={timestamp} level={record.levelname} msg="{record.getMessage()}"'
