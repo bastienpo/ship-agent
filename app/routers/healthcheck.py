@@ -1,6 +1,5 @@
 """Healthcheck router."""
 
-import os
 
 from fastapi import APIRouter
 
@@ -19,7 +18,7 @@ async def healthcheck() -> Healthcheck:
     return {
         "status": "available",
         "system_info": {
-            "environment": os.getenv("ENVIRONMENT"),
+            "environment": "development",
             "version": "0.0.1",
         },
     }

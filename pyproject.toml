@@ -1,7 +1,7 @@
 [project]
 name = "heypi"
 version = "0.1.0"
-description = "Make LLM interoperable and following OpenAI API."
+description = "An API."
 readme = "README.md"
 requires-python = ">=3.13"
 classifiers = [
@@ -11,8 +11,9 @@ classifiers = [
 dependencies = [
   "fastapi>=0.115.3",
   "granian>=1.6.1",
+  "psycopg[binary]>=3.2.3",
   "pydantic>=2.9.2",
-  "pydantic-settings>=2.6.0",
+  "pydantic-settings>=2.6",
   "uvloop>=0.21",
 ]
 
@@ -21,7 +22,7 @@ dev-dependencies = ["granian[reload]>=1.6.1"]
 
 [tool.ruff]
 line-length = 88
-target-version = "py312"
+target-version = "py313"
 
 [tool.ruff.lint]
 select = ["ALL"]
