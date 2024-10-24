@@ -1,9 +1,11 @@
 """Healthcheck router."""
 
+from typing import Annotated
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from app.internal.data.healthcheck import Healthcheck
+from app.internal.settings import Settings, get_settings
 
 router = APIRouter(prefix="/v1", tags=["healthcheck"])
 
@@ -13,12 +15,14 @@ router = APIRouter(prefix="/v1", tags=["healthcheck"])
     summary="Healthcheck endpoint.",
     response_model=Healthcheck,
 )
-async def healthcheck() -> Healthcheck:
+async def healthcheck(
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> Healthcheck:
     """Healthcheck endpoint."""
     return {
         "status": "available",
         "system_info": {
-            "environment": "development",
+            "environment": settings.environment,
             "version": "0.0.1",
         },
     }

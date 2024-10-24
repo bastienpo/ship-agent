@@ -2,10 +2,11 @@
 
 import logging
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.middlewares import RequestLoggingMiddleware, TestMiddleware
+from app.internal.server.middlewares import RequestLoggingMiddleware
+from app.internal.settings import get_settings
 from app.routers import healthcheck
 
 logging.config.fileConfig("logging.conf")
@@ -15,6 +16,7 @@ api = FastAPI(
     title="HeyAPI Chat",
     summary="An API.",
     version="0.0.1",
+    dependencies=[Depends(get_settings)],
 )
 
 api.include_router(healthcheck.router)

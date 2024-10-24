@@ -2,8 +2,8 @@
 
 all: help
 
-dev:
-	@uv run granian --interface asgi --reload --loop uvloop --workers 1 --log app.main:api
+run:
+	@uv run granian app.main:api
 
 audit:
 	@echo "Checking code for linting errors (ruff)..."
@@ -24,7 +24,7 @@ clean:
 
 help:
 	@echo "Usage: make <target>"
-	@echo "  dev      Run the application in development mode"
+	@echo "  run      Run the application"
 	@echo "  audit    Check the code quality"
 	@echo "  fix      Fix the code quality"
 	@echo "  clean    Clean the project files"

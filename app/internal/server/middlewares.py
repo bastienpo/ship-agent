@@ -24,21 +24,4 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
         """Dispatch the request."""
         self.logger.info("received request", extra={"request": request})
 
-        print("Logging middleware called")
-
-        return await call_next(request)
-
-
-class TestMiddleware(BaseHTTPMiddleware):
-    """Test middleware."""
-
-    def __init__(self, app: ASGIApp) -> None:
-        """Initialize the middleware."""
-        super().__init__(app)
-
-    async def dispatch(
-        self, request: Request, call_next: RequestResponseEndpoint
-    ) -> Response:
-        """Dispatch the request."""
-        print("Test middleware called")
         return await call_next(request)
