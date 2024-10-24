@@ -1,4 +1,4 @@
-ARG PYTHON_VERSION=3.12
+ARG PYTHON_VERSION=3.13
 FROM ghcr.io/astral-sh/uv:python${PYTHON_VERSION}-bookworm-slim AS builder
 
 ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
@@ -11,7 +11,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv sync --frozen --no-install-project --no-dev
 
-ADD .. /app
+ADD . /app
 
 # Install project dependencies
 RUN --mount=type=cache,target=/root/.cache/uv \
@@ -42,4 +42,4 @@ ENV PATH="/app/.venv/bin:$PATH" \
 
 EXPOSE 8000
 
-CMD ["granian", "--interface", "asgi", "--workers", "4", "--threads", "4", "--loop", "uvloop", "--host", "0.0.0.0", "--port", "8000", "app.main:app"]
+CMD ["granian", "--interface", "asgi", "--workers", "4", "--threads", "4", "--loop", "uvloop", "--host", "0.0.0.0", "app.main:app"]
