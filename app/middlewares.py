@@ -25,19 +25,3 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
         self.logger.info("received request", extra={"request": request})
 
         return await call_next(request)
-
-
-class CommonHeadersMiddleware(BaseHTTPMiddleware):
-    """Common headers middleware."""
-
-    async def dispatch(
-        self, request: Request, call_next: RequestResponseEndpoint
-    ) -> Response:
-        """Dispatch the request."""
-        response = await call_next(request)
-        response.headers.append("Referrer-Policy", "strict-origin-when-cross-origin")
-        response.headers.append("X-Content-Type-Options", "nosniff")
-        response.headers.append("X-Frame-Options", "deny")
-        response.headers.append("X-XSS-Protection", "0")
-
-        return response

@@ -4,8 +4,8 @@ import logging
 
 from fastapi import FastAPI
 
-from app.middlewares import CommonHeadersMiddleware, RequestLoggingMiddleware
-from app.routers import chat, conversation, healthcheck
+from app.middlewares import RequestLoggingMiddleware
+from app.routers import healthcheck
 
 logging.config.fileConfig("logging.conf")
 logger = logging.getLogger(__name__)
@@ -16,8 +16,4 @@ api = FastAPI(
 )
 
 api.include_router(healthcheck.router)
-api.include_router(chat.router)
-api.include_router(conversation.router)
-
-api.add_middleware(RequestLoggingMiddleware, logger=logger)
-api.add_middleware(CommonHeadersMiddleware)
+# api.add_middleware(RequestLoggingMiddleware, logger=logger)

@@ -1,12 +1,13 @@
-include .env
-export
-
 .PHONY: run clean
 
-run:
-	@uv run granian app.main:api
+dev:
+	@uv run granian --interface asgi --reload --loop uvloop --workers 1 --log app.main:api
+
+audit:
+	uv run ruff check . --config pyproject.toml
+	uv run ruff format . --check --config pyproject.toml
 
 clean:
-	rm -rf **/*.pyc \
-		**/__pycache__ \
-		.pytest_cache
+	find . -type d -name "__pycache__" -exec rm -rf {} +
+	find . -type f -name "*.pyc" -delete
+	rm -rf .pytest_cache

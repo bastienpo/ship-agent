@@ -9,15 +9,11 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-  "asyncio>=3.4.3",
-  "beanie>=1.27",
-  "fastapi>=0.115.2",
-  "granian>=1.6",
-  "orjson>=3.10.7",
+  "fastapi>=0.115.3",
+  "granian>=1.6.1",
   "pydantic>=2.9.2",
-  "pydantic-settings>=2.5.2",
-  "swarm",
-  "uvloop>=0.20",
+  "pydantic-settings>=2.6.0",
+  "uvloop>=0.21",
 ]
 
 [tool.uv]
@@ -25,3 +21,13 @@ dev-dependencies = [ "granian[reload]>=1.6.0" ]
 
 [tool.uv.sources]
 swarm = { git = "https://github.com/openai/swarm.git" }
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = ["COM812", "ISC001", "D104"]
+
+pydocstyle.convention = "google"
