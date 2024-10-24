@@ -16,4 +16,4 @@ api = FastAPI(
 )
 
 api.include_router(healthcheck.router)
-# api.add_middleware(RequestLoggingMiddleware, logger=logger)
+api.add_middleware(RequestLoggingMiddleware, logger=logger)
