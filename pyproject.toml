@@ -3,10 +3,10 @@ name = "heypi"
 version = "0.1.0"
 description = "Make LLM interoperable and following OpenAI API."
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.13"
 classifiers = [
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
   "fastapi>=0.115.3",
@@ -17,10 +17,7 @@ dependencies = [
 ]
 
 [tool.uv]
-dev-dependencies = [ "granian[reload]>=1.6.0" ]
-
-[tool.uv.sources]
-swarm = { git = "https://github.com/openai/swarm.git" }
+dev-dependencies = ["granian[reload]>=1.6.1"]
 
 [tool.ruff]
 line-length = 88
