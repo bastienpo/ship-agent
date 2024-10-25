@@ -12,11 +12,10 @@ router = APIRouter(prefix="/v1", tags=["healthcheck"])
 
 @router.get(
     "/healthcheck",
-    summary="Healthcheck endpoint.",
     status_code=status.HTTP_200_OK,
     response_model=Healthcheck,
 )
-async def healthcheck(
+async def healthcheck_handler(
     settings: Annotated[Settings, Depends(get_settings)],
 ) -> Healthcheck:
     """Healthcheck endpoint."""
