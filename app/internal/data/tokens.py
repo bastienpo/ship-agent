@@ -3,8 +3,9 @@
 import base64
 import hashlib
 from datetime import UTC, datetime, timedelta
+from enum import Enum
 from secrets import token_bytes
-from typing import Literal
+from typing import Any
 
 from psycopg import AsyncConnection
 from pydantic import (
@@ -16,7 +17,12 @@ from pydantic import (
     model_serializer,
 )
 
-Scope = Literal["activation", "authentication"]
+
+class Scope(str, Enum):
+    """Token scope."""
+
+    ACTIVATION = "activation"
+    AUTHENTICATION = "authentication"
 
 
 class AuthenticationTokenCreate(BaseModel):
@@ -38,7 +44,7 @@ class TokenModel(BaseModel):
     @model_serializer
     def serialize_without_plain_text(
         self: "TokenModel",
-    ) -> dict[str, str | bytes | datetime | Scope]:
+    ) -> dict[str, Any]:
         """Serialize the model to a dictionary without the plain text."""
         return {
             "hash": self.hash.get_secret_value(),
@@ -64,15 +70,15 @@ def create_token(user_id: int, ttl: timedelta, scope: Scope) -> TokenModel:
     # Encode to base32 without padding
     token_plain_text = base64.b32encode(random_bytes).decode().rstrip("=")
 
-    # Hash the token using sha256
-    token_hash = hashlib.sha256(token_plain_text.encode("utf-8")).digest()
+    # Hash the token using sha3_256
+    token_hash = hashlib.sha3_256(token_plain_text.encode("utf-8")).digest()
 
     return TokenModel(
         plain_text=SecretStr(token_plain_text),
         hash=SecretBytes(token_hash),
         user_id=user_id,
         expiry=datetime.now(UTC) + ttl,
-        scope=scope,
+        scope=scope.value,
     )
 
 

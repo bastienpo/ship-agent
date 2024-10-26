@@ -9,7 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from psycopg_pool import AsyncConnectionPool
 
 from app.internal.data.database import get_database_pool
-from app.internal.data.tokens import AuthenticationTokenCreate, new_token
+from app.internal.data.tokens import AuthenticationTokenCreate, Scope, new_token
 from app.internal.data.users import get_user_by_email
 
 router = APIRouter(prefix="/v1", tags=["tokens"])
@@ -38,7 +38,7 @@ async def create_authentication_token_handler(
 
     async with pool.connection(timeout=3) as conn:
         token = await new_token(
-            conn, user_id=user.id, scope="authentication", ttl=timedelta(days=1)
+            conn, user_id=user.id, scope=Scope.AUTHENTICATION, ttl=timedelta(days=1)
         )
 
     return {
