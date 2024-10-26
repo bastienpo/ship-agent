@@ -7,16 +7,30 @@ from secrets import token_bytes
 from typing import Literal
 
 from psycopg import AsyncConnection
-from pydantic import BaseModel, Field, model_serializer
+from pydantic import (
+    BaseModel,
+    EmailStr,
+    Field,
+    SecretBytes,
+    SecretStr,
+    model_serializer,
+)
 
 Scope = Literal["activation", "authentication"]
+
+
+class AuthenticationTokenCreate(BaseModel):
+    """Authentication token create model."""
+
+    email: EmailStr = Field(max_length=256)
+    password: SecretStr = Field(min_length=8, max_length=256)
 
 
 class TokenModel(BaseModel):
     """Token model."""
 
-    plain_text: str = Field(min_length=26, max_length=26)
-    hash: bytes
+    plain_text: SecretStr = Field(min_length=26, max_length=26)
+    hash: SecretBytes
     user_id: int
     expiry: datetime
     scope: Scope
@@ -27,7 +41,7 @@ class TokenModel(BaseModel):
     ) -> dict[str, str | bytes | datetime | Scope]:
         """Serialize the model to a dictionary without the plain text."""
         return {
-            "hash": self.hash,
+            "hash": self.hash.get_secret_value(),
             "user_id": self.user_id,
             "expiry": self.expiry,
             "scope": self.scope,
@@ -54,8 +68,8 @@ def create_token(user_id: int, ttl: timedelta, scope: Scope) -> TokenModel:
     token_hash = hashlib.sha256(token_plain_text.encode("utf-8")).digest()
 
     return TokenModel(
-        plain_text=token_plain_text,
-        hash=token_hash,
+        plain_text=SecretStr(token_plain_text),
+        hash=SecretBytes(token_hash),
         user_id=user_id,
         expiry=datetime.now(UTC) + ttl,
         scope=scope,
