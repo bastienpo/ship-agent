@@ -7,7 +7,7 @@ from secrets import token_bytes
 from typing import Literal
 
 from psycopg import AsyncConnection
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_serializer
 
 Scope = Literal["activation", "authentication"]
 
@@ -20,6 +20,18 @@ class TokenModel(BaseModel):
     user_id: int
     expiry: datetime
     scope: Scope
+
+    @model_serializer
+    def serialize_without_plain_text(
+        self: "TokenModel",
+    ) -> dict[str, str | bytes | datetime | Scope]:
+        """Serialize the model to a dictionary without the plain text."""
+        return {
+            "hash": self.hash,
+            "user_id": self.user_id,
+            "expiry": self.expiry,
+            "scope": self.scope,
+        }
 
 
 def create_token(user_id: int, ttl: timedelta, scope: Scope) -> TokenModel:
@@ -50,3 +62,55 @@ def create_token(user_id: int, ttl: timedelta, scope: Scope) -> TokenModel:
     )
 
 
+async def insert_token(conn: AsyncConnection, token: TokenModel) -> None:
+    """CRUD operation: Insert a token into the database.
+
+    Args:
+        conn: The database connection.
+        token: The token model.
+    """
+    query = """
+    INSERT INTO tokens (hash, user_id, expiry, scope)
+    VALUES (%(hash)s, %(user_id)s, %(expiry)s, %(scope)s)
+    """
+
+    await conn.execute(query, token.model_dump())
+
+
+async def new_token(
+    conn: AsyncConnection, user_id: int, ttl: timedelta, scope: Scope
+) -> TokenModel:
+    """Create a new token and insert it into the database.
+
+    Generate a new token, insert it into the database, and return the token.
+
+    Args:
+        conn: The database connection.
+        user_id: The user ID to associate with the token.
+        ttl: The time-to-live for the token.
+        scope: The scope of the token.
+
+    Returns:
+        A token model.
+    """
+    token = create_token(user_id, ttl, scope)
+    await insert_token(conn, token)
+
+    return token
+
+
+async def delete_all_for_user(
+    conn: AsyncConnection, user_id: int, scope: Scope
+) -> None:
+    """CRUD operation: Delete all tokens for a user.
+
+    Args:
+        conn: The database connection.
+        user_id: The user ID to delete tokens for.
+        scope: The scope of the tokens to delete.
+    """
+    query = """
+    DELETE FROM tokens WHERE scope = %(scope)s AND user_id = %(user_id)s
+    """
+
+    await conn.execute(query, {"scope": scope, "user_id": user_id})
