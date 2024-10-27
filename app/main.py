@@ -12,7 +12,7 @@ from app.internal.data.database import init_database
 from app.internal.server.handlers import http_exception_handler
 from app.internal.server.middlewares import RequestLoggingMiddleware
 from app.internal.settings import get_settings
-from app.routers import healthcheck, tokens, users
+from app.routers import agents, healthcheck, tokens, users
 
 logging.config.fileConfig("logging.conf")
 logger = logging.getLogger(__name__)
@@ -46,6 +46,7 @@ api.add_exception_handler(StarletteHTTPException, http_exception_handler)
 api.include_router(healthcheck.router)
 api.include_router(users.router)
 api.include_router(tokens.router)
+api.include_router(agents.router)
 
 api.add_middleware(RequestLoggingMiddleware, logger=logger)
 api.add_middleware(CORSMiddleware, allow_origins=["*"])

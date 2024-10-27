@@ -6,7 +6,11 @@ from app.internal.settings import get_settings
 
 
 async def init_database() -> Pool:
-    """Create a new database pool."""
+    """Create a new database pool.
+
+    Returns:
+        The database pool.
+    """
     settings = get_settings()
     dsn = settings.get_dsn()
 

@@ -2,14 +2,13 @@
 
 from datetime import timedelta
 
-from argon2 import PasswordHasher
-from argon2.exceptions import VerificationError
 from fastapi import APIRouter, HTTPException, Request, status
 
 from app.internal.data.tokens import AuthenticationTokenCreate, Scope, new_token
 from app.internal.data.users import get_user_by_email, verify_password
 
 router = APIRouter(prefix="/v1", tags=["tokens"])
+
 
 @router.post(
     "/tokens/authentification",
