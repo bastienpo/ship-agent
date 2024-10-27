@@ -5,10 +5,9 @@ from typing import Annotated
 
 from argon2 import PasswordHasher
 from argon2.exceptions import VerificationError
-from fastapi import APIRouter, Depends, HTTPException, status
-from psycopg_pool import AsyncConnectionPool
+from asyncpg import Pool
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 
-from app.internal.data.database import get_database_pool
 from app.internal.data.tokens import AuthenticationTokenCreate, Scope, new_token
 from app.internal.data.users import get_user_by_email
 
@@ -21,10 +20,10 @@ router = APIRouter(prefix="/v1", tags=["tokens"])
 )
 async def create_authentication_token_handler(
     payload: AuthenticationTokenCreate,
-    pool: Annotated[AsyncConnectionPool, Depends(get_database_pool)],
+    request: Request,
 ) -> dict[str, str]:
     """Create an authentication token."""
-    async with pool.connection(timeout=3) as conn:
+    async with request.app.async_pool.acquire() as conn:
         user = await get_user_by_email(conn, payload.email)
 
     try:
@@ -36,7 +35,7 @@ async def create_authentication_token_handler(
         msg = "Invalid credentials"
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=msg) from e
 
-    async with pool.connection(timeout=3) as conn:
+    async with request.app.async_pool.acquire() as conn:
         token = await new_token(
             conn, user_id=user.id, scope=Scope.AUTHENTICATION, ttl=timedelta(days=1)
         )

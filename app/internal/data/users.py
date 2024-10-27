@@ -3,7 +3,7 @@
 from datetime import datetime
 
 from argon2 import PasswordHasher
-from psycopg import AsyncConnection
+from asyncpg.connection import Connection
 from pydantic import (
     BaseModel,
     EmailStr,
@@ -27,18 +27,6 @@ class UserCreate(BaseModel):
     email: EmailStr = Field(max_length=256)
     password: SecretStr = Field(min_length=8, max_length=256)
 
-    @model_serializer
-    def serialize_with_password_hash(self) -> dict[str, str]:
-        """Serialize the model to a dictionary.
-
-        Override the default serialization to hash the password.
-        """
-        return {
-            "name": self.name,
-            "email": self.email,
-            "password_hash": PasswordHasher().hash(self.password.get_secret_value()),
-        }
-
 
 class UserModel(BaseModel):
     """User model."""
@@ -51,7 +39,7 @@ class UserModel(BaseModel):
     version: int
 
 
-async def insert_user(conn: AsyncConnection, user: UserCreate) -> None:
+async def insert_user(conn: Connection, user: UserCreate) -> None:
     """Insert a user into the database.
 
     Args:
@@ -60,33 +48,28 @@ async def insert_user(conn: AsyncConnection, user: UserCreate) -> None:
     """
     query = """
     INSERT INTO users (name, email, password_hash)
-        VALUES (%(name)s, %(email)s, %(password_hash)s)
+        VALUES ($1, $2, $3)
         RETURNING id, created_at
     """
 
-    await conn.execute(query, params=user.model_dump(), prepare=True)
+    password_hash = (
+        PasswordHasher().hash(user.password.get_secret_value()).encode("utf-8")
+    )
+
+    await conn.execute(query, user.name, user.email, password_hash, timeout=3)
 
 
-async def get_user_by_email(conn: AsyncConnection, email: EmailStr) -> UserModel:
+async def get_user_by_email(conn: Connection, email: EmailStr) -> UserModel:
     """Get a user by email."""
     query = """
     SELECT id, created_at, name, email, password_hash, version
         FROM users
-        WHERE email = %(email)s
+        WHERE email = $1
     """
-
-    execution = await conn.execute(query, params={"email": email}, prepare=True)
-    row = await execution.fetchone()
+    row = await conn.fetchrow(query, email, timeout=3)
 
     if row is None:
         msg = "User does not exist"
         raise ValueError(msg)
 
-    return UserModel(
-        id=row[0],
-        created_at=row[1],
-        name=row[2],
-        email=row[3],
-        password_hash=row[4],
-        version=row[5],
-    )
+    return UserModel.model_validate(dict(row))

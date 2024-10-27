@@ -8,7 +8,7 @@ from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from app.internal.data.database import get_database_pool
+from app.internal.data.database import init_database
 from app.internal.server.handlers import http_exception_handler
 from app.internal.server.middlewares import RequestLoggingMiddleware
 from app.internal.settings import get_settings
@@ -25,19 +25,17 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     Args:
         app: The FastAPI application.
     """
-    # Retrieve the settings and open a connection pool to the database
-    app.async_pool = get_database_pool()
-    await app.async_pool.open()
-    logger.info("Connection pool opened")
+    app.async_pool = await init_database()
+    logger.info("Connection to database opened")
+
     yield
 
-    # Close the connection pool when the application shuts down
     await app.async_pool.close()
-    logger.info("Connection pool closed")
+    logger.info("Connection to database closed")
 
 
 api = FastAPI(
-    title="HeyAPI Chat",
+    title="Ship Agent",
     version="0.0.1",
     lifespan=lifespan,
     dependencies=[Depends(get_settings)],

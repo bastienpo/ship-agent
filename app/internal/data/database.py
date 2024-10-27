@@ -1,16 +1,13 @@
 """Database utilities."""
 
-from functools import lru_cache
-
-from psycopg_pool import AsyncConnectionPool
+from asyncpg import Pool, create_pool
 
 from app.internal.settings import get_settings
 
 
-@lru_cache(maxsize=1)
-def get_database_pool() -> AsyncConnectionPool:
+async def init_database() -> Pool:
     """Create a new database pool."""
     settings = get_settings()
     dsn = settings.get_dsn()
 
-    return AsyncConnectionPool(conninfo=dsn, open=False, max_size=50, max_idle=50)
+    return await create_pool(dsn, max_size=50)

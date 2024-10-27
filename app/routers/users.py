@@ -1,12 +1,8 @@
 """Users router."""
 
-from typing import Annotated
+from asyncpg.exceptions import UniqueViolationError
+from fastapi import APIRouter, HTTPException, Request, status
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from psycopg.errors import UniqueViolation
-from psycopg_pool import AsyncConnectionPool
-
-from app.internal.data.database import get_database_pool
 from app.internal.data.users import UserCreate, insert_user
 
 router = APIRouter(prefix="/v1", tags=["users"])
@@ -18,13 +14,13 @@ router = APIRouter(prefix="/v1", tags=["users"])
 )
 async def register_user_handler(
     payload: UserCreate,
-    pool: Annotated[AsyncConnectionPool, Depends(get_database_pool)],
+    request: Request,
 ) -> dict[str, str]:
     """Register a user."""
-    async with pool.connection(timeout=3) as conn:
+    async with request.app.async_pool.acquire() as conn:
         try:
             await insert_user(conn, payload)
-        except UniqueViolation as e:
+        except UniqueViolationError as e:
             msg = "User already exists"
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=msg) from e
 

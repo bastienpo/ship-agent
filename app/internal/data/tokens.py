@@ -7,7 +7,7 @@ from enum import Enum
 from secrets import token_bytes
 from typing import Any
 
-from psycopg import AsyncConnection
+from asyncpg.connection import Connection
 from pydantic import (
     BaseModel,
     EmailStr,
@@ -41,18 +41,6 @@ class TokenModel(BaseModel):
     expiry: datetime
     scope: Scope
 
-    @model_serializer
-    def serialize_without_plain_text(
-        self: "TokenModel",
-    ) -> dict[str, Any]:
-        """Serialize the model to a dictionary without the plain text."""
-        return {
-            "hash": self.hash.get_secret_value(),
-            "user_id": self.user_id,
-            "expiry": self.expiry,
-            "scope": self.scope,
-        }
-
 
 def create_token(user_id: int, ttl: timedelta, scope: Scope) -> TokenModel:
     """Create a token hashed with sha256.
@@ -73,16 +61,18 @@ def create_token(user_id: int, ttl: timedelta, scope: Scope) -> TokenModel:
     # Hash the token using sha3_256
     token_hash = hashlib.sha3_256(token_plain_text.encode("utf-8")).digest()
 
+    expiry = datetime.now(UTC) + ttl
+
     return TokenModel(
         plain_text=SecretStr(token_plain_text),
         hash=SecretBytes(token_hash),
         user_id=user_id,
-        expiry=datetime.now(UTC) + ttl,
+        expiry=expiry,
         scope=scope.value,
     )
 
 
-async def insert_token(conn: AsyncConnection, token: TokenModel) -> None:
+async def insert_token(conn: Connection, token: TokenModel) -> None:
     """CRUD operation: Insert a token into the database.
 
     Args:
@@ -91,14 +81,21 @@ async def insert_token(conn: AsyncConnection, token: TokenModel) -> None:
     """
     query = """
     INSERT INTO tokens (hash, user_id, expiry, scope)
-    VALUES (%(hash)s, %(user_id)s, %(expiry)s, %(scope)s)
+    VALUES ($1, $2, $3, $4)
     """
 
-    await conn.execute(query, token.model_dump())
+    await conn.execute(
+        query,
+        token.hash.get_secret_value(),
+        token.user_id,
+        token.expiry,
+        token.scope,
+        timeout=3,
+    )
 
 
 async def new_token(
-    conn: AsyncConnection, user_id: int, ttl: timedelta, scope: Scope
+    conn: Connection, user_id: int, ttl: timedelta, scope: Scope
 ) -> TokenModel:
     """Create a new token and insert it into the database.
 
@@ -119,9 +116,7 @@ async def new_token(
     return token
 
 
-async def delete_all_for_user(
-    conn: AsyncConnection, user_id: int, scope: Scope
-) -> None:
+async def delete_all_for_user(conn: Connection, user_id: int, scope: Scope) -> None:
     """CRUD operation: Delete all tokens for a user.
 
     Args:
@@ -130,7 +125,7 @@ async def delete_all_for_user(
         scope: The scope of the tokens to delete.
     """
     query = """
-    DELETE FROM tokens WHERE scope = %(scope)s AND user_id = %(user_id)s
+    DELETE FROM tokens WHERE scope = $1 AND user_id = $2
     """
 
-    await conn.execute(query, {"scope": scope, "user_id": user_id})
+    await conn.execute(query, scope, user_id, timeout=3)
