@@ -3,6 +3,7 @@
 from datetime import datetime
 
 from argon2 import PasswordHasher
+from argon2.exceptions import VerificationError
 from asyncpg.connection import Connection
 from pydantic import (
     BaseModel,
@@ -10,18 +11,11 @@ from pydantic import (
     Field,
     SecretBytes,
     SecretStr,
-    model_serializer,
 )
 
 
 class UserCreate(BaseModel):
-    """User input model with validation.
-
-    Validation:
-        - Name: 1-256 characters
-        - Email: 1-256 characters
-        - Password: 8-256 characters
-    """
+    """User input model with validation."""
 
     name: str = Field(min_length=1, max_length=256)
     email: EmailStr = Field(max_length=256)
@@ -37,6 +31,24 @@ class UserModel(BaseModel):
     email: EmailStr
     password_hash: SecretBytes
     version: int
+
+
+def verify_password(password: SecretStr, password_hash: SecretStr) -> bool:
+    """Verify a password against a hashed password.
+
+    Args:
+        password: The password to verify.
+        password_hash: The hashed password to verify against.
+
+    Returns:
+        True if the password is correct, False otherwise.
+    """
+    try:
+        return PasswordHasher().verify(
+            password_hash.get_secret_value(), password.get_secret_value()
+        )
+    except VerificationError:
+        return False
 
 
 async def insert_user(conn: Connection, user: UserCreate) -> None:

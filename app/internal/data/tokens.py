@@ -5,7 +5,6 @@ import hashlib
 from datetime import UTC, datetime, timedelta
 from enum import Enum
 from secrets import token_bytes
-from typing import Any
 
 from asyncpg.connection import Connection
 from pydantic import (
@@ -14,7 +13,6 @@ from pydantic import (
     Field,
     SecretBytes,
     SecretStr,
-    model_serializer,
 )
 
 
