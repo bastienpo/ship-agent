@@ -1,22 +1,18 @@
-.PHONY: run audit fix clean
+.PHONY: audit fix clean
 
 all: help
 
-run:
-	@uv run granian app.main:api
-
 audit:
 	@echo "Checking code for linting errors (ruff)..."
-	uv tool run ruff check . --config pyproject.toml
+	uv tool run ruff check libs --config pyproject.toml
 	@echo "Checking code for formatting errors (ruff)..."
-	uv tool run ruff format . --check --config pyproject.toml
+	uv tool run ruff format libs --check --config pyproject.toml
 
 fix:
 	@echo "Fixing code for linting errors (ruff)..."
-	uv tool run ruff check . --config pyproject.toml --select I --fix
+	uv tool run ruff check libs --config pyproject.toml --select I --fix
 	@echo "Fixing code for formatting errors (ruff)..."
-	uv tool run ruff format . --config pyproject.toml
-	
+	uv tool run ruff format libs --config pyproject.toml
 
 clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} +
@@ -25,7 +21,6 @@ clean:
 
 help:
 	@echo "Usage: make <target>"
-	@echo "  run      Run the application"
 	@echo "  audit    Check the code quality"
 	@echo "  fix      Fix the code quality"
 	@echo "  clean    Clean the project files"
