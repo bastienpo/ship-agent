@@ -40,9 +40,10 @@ The goal of this project is not to create a new AI framework, but to make it eas
     - [ ] Use typer and granian to create a server that you can immediately run for development and testing
     - [ ] Generate a docker image for the server
 - [ ] Generate the OpenAPI specification for the Agent
-    - [ ] Support streaming responses
-    - [ ] Add tracing with monitoring tools (langfuse, phoenix, etc.) and posthog for experimentation
-    - [ ] Support some kind of authentication and authorization
+- [ ] Support streaming responses
+- [ ] Add tracing with monitoring tools (langfuse, phoenix, etc.) and posthog for experimentation
+- [ ] Support additional frameworks (multi-agents, etc.)
+- [ ] Support some kind of authentication and authorization
 
 > [!NOTE]
 > The roadmap is not set in stone. It will evolve as we progress. This project is a side project, I just do it for fun. It comes from an observation: that most of the time, the hardest part is to ship the application in production with most of the AI frameworks.

@@ -5,7 +5,20 @@ description = "Add your description here"
 readme = "README.md"
 authors = []
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "fastapi>=0.115.4",
+    "granian>=1.6.2",
+    "pydantic-settings>=2.6.0",
+    "pydantic[email]>=2.9.2",
+    "typer>=0.12.5",
+    "uvloop>=0.21.0",
+]
+
+[project.scripts]
+fastagent = "fastagent_cli.cli:app"
+
+[tool.uv]
+dev-dependencies = ["granian[reload]>=1.6.2"]
 
 [build-system]
 requires = ["hatchling"]

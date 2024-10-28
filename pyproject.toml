@@ -9,14 +9,18 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
 ]
-dependencies = []
+dependencies = ["fastagent-cli", "fastagent-core"]
+
+[tool.uv.sources]
+fastagent-cli = { workspace = true }
+fastagent-core = { workspace = true }
 
 [tool.uv.workspace]
 members = ["libs/cli", "libs/core"]
 
 [tool.ruff]
 line-length = 88
-target-version = "py313"
+target-version = "py312"
 
 [tool.ruff.lint]
 select = ["ALL"]
