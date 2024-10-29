@@ -37,3 +37,6 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
         """
         self.logger.info("received request", extra={"request": request})
         return await call_next(request)
+
+
+# Request MaxSizeMiddleware
