@@ -9,6 +9,8 @@ dependencies = [
     "dspy-ai>=2.5.18",
     "fastapi>=0.115.4",
     "pydantic>=2.9.2",
+    "uvicorn>=0.32.0",
+    "uvloop>=0.21.0",
 ]
 
 [build-system]
